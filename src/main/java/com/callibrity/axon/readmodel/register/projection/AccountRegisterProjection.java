@@ -6,6 +6,7 @@ import com.callibrity.axon.readmodel.register.entity.Transaction;
 import com.callibrity.axon.readmodel.register.query.FindAllTransactionsQuery;
 import com.callibrity.axon.readmodel.register.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
@@ -16,12 +17,14 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @ProcessingGroup("account-register")
+@Slf4j
 public class AccountRegisterProjection {
 
     private final TransactionRepository repository;
 
     @EventHandler
     public void on(MoneyDepositedEvent event) {
+        log.info("New {} deposit into account {}.", event.getAmount(), event.getAccountId());
         repository.save(Transaction.builder()
                 .accountId(event.getAccountId())
                 .balance(event.getBalance())
@@ -31,6 +34,7 @@ public class AccountRegisterProjection {
 
     @EventHandler
     public void on(MoneyWithdrawnEvent event) {
+        log.info("New {} withdrawal from account {}.", event.getAmount(), event.getAccountId());
         repository.save(Transaction.builder()
                 .accountId(event.getAccountId())
                 .balance(event.getBalance())

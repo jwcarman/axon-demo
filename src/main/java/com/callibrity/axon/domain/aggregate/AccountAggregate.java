@@ -14,17 +14,20 @@ import com.callibrity.axon.domain.exception.OutstandingBalanceException;
 import com.callibrity.axon.domain.service.CustomerNotificationService;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
-import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import java.util.UUID;
 
+import static org.axonframework.modelling.command.AggregateLifecycle.apply;
+
 @Aggregate(snapshotTriggerDefinition = "accountSnapshotTrigger")
 @Getter
 @NoArgsConstructor
+@Slf4j
 public class AccountAggregate {
 
     @AggregateIdentifier
@@ -41,12 +44,12 @@ public class AccountAggregate {
     @CommandHandler
     public AccountAggregate(OpenAccountCommand command) {
         final String accountId = UUID.randomUUID().toString();
-
-        AggregateLifecycle.apply(AccountOpenedEvent.builder()
+        log.info("Opening account {}...", accountId);
+        apply(AccountOpenedEvent.builder()
                 .accountId(accountId)
                 .build());
 
-        AggregateLifecycle.apply(MoneyDepositedEvent.builder()
+        apply(MoneyDepositedEvent.builder()
                 .accountId(accountId)
                 .amount(command.getOpeningBalance())
                 .balance(command.getOpeningBalance())
@@ -56,7 +59,8 @@ public class AccountAggregate {
     @CommandHandler
     public void handle(DepositMoneyCommand command) {
         verifyOpen();
-        AggregateLifecycle.apply(MoneyDepositedEvent.builder()
+        log.info("Depositing {} into account {}...", command.getAmount(), accountId);
+        apply(MoneyDepositedEvent.builder()
                 .accountId(accountId)
                 .balance(balance + command.getAmount())
                 .amount(command.getAmount())
@@ -76,7 +80,8 @@ public class AccountAggregate {
         if (event.getBalance() < 100) {
             notificationService.sendLowBalanceNotification(accountId, event.getBalance());
         }
-        AggregateLifecycle.apply(event);
+        log.info("Withdrawing {} from account {}...", command.getAmount(), accountId);
+        apply(event);
     }
 
     private void verifySufficientFunds(int amount) {
@@ -95,7 +100,8 @@ public class AccountAggregate {
     public void handle(CloseAccountCommand command) {
         verifyOpen();
         verifyZeroBalance();
-        AggregateLifecycle.apply(AccountClosedEvent.builder()
+        log.info("Closing account {}...", accountId);
+        apply(AccountClosedEvent.builder()
                 .accountId(accountId)
                 .build());
     }
