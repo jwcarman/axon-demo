@@ -2,7 +2,7 @@
 
 ### Building the Code
 
-We will use [Apache Maven](https://maven.apache.org/) to build the code. The build uses [Testcontainers](https://www.testcontainers.org/) to start up Docker containers during the build for external resources (the Axon Server). The local Docker daemon must be running. Once that is in place, you simply run:
+This project uses [Apache Maven](https://maven.apache.org/) to build the code. The build uses [Testcontainers](https://www.testcontainers.org/) to start up Docker containers during the build for external resources (the Axon Server). The local Docker daemon must be running. Once that is in place, you simply run:
 
 ```text
 mvn clean install
@@ -10,7 +10,7 @@ mvn clean install
 
 ### Setting Up Axon Server
 
-We will use [Axon Server](https://axoniq.io/product-overview/axon-server) to serve as our event store. To start Axon Server locally, issue the following Docker command:
+[Axon Server](https://axoniq.io/product-overview/axon-server) will serve as the event store. To start Axon Server locally, issue the following Docker command:
 
 ```text
 docker run -d --name local-axon-server -p 8024:8024 -p 8124:8124 axoniq/axonserver
