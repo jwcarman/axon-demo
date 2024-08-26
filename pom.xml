@@ -16,7 +16,7 @@
 		<java.version>11</java.version>
 
 		<axon.version>4.2.2</axon.version>
-		<springfox.version>2.9.2</springfox.version>
+		<springfox.version>2.10.0</springfox.version>
 		<testcontainers.version>1.12.5</testcontainers.version>
 	</properties>
 
